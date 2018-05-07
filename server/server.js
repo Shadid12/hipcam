@@ -4,6 +4,11 @@ const bodyParser = require('body-parser');
 const multer  = require('multer');
 const fs = require('fs');
 
+const vision = require('@google-cloud/vision');
+
+// Creates a client
+const client = new vision.ImageAnnotatorClient();
+
 
 const storage = multer.diskStorage({
     destination: './public/users',
@@ -40,8 +45,20 @@ app.post('/photo', (req, res) => {
     // console.log(JSON.stringify(req.body.photo)) // form fields
     let rand = Math.floor(Math.random() * 99999) + 1;
     fs.writeFile(`./uploads/${rand}-out.png`, base64Data, 'base64', (err) => {
-        console.log(`${rand} Done Yo`);
-        // now we take this file and analyze with google :)
+        // console.log(`${rand} Done Yo`);
+        const fileName = `./uploads/${rand}-out.png`;
+        client
+            .webDetection(fileName)
+            .then(results => {
+                res.send(JSON.stringify({ results: results }));
+                // console.log(results);
+                // const properties = results[0].imagePropertiesAnnotation;
+                // const colors = properties.dominantColors.colors;
+                // colors.forEach(color => console.log(color));
+            })
+            .catch(err => {
+                console.error('ERROR:', err);
+            });
     });
 });
 
