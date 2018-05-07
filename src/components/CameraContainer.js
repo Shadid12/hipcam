@@ -25,7 +25,12 @@ export default class CameraContainer extends React.Component {
     }
 
     analyze = () => {
-        console.log(this.state.img);
+        let formData = new FormData();
+        formData.append('photo', this.state.img);
+        fetch('http://localhost:5000/photo/', {
+            method: 'POST',
+            body: formData
+        })
     }
 
     render() {
@@ -35,7 +40,7 @@ export default class CameraContainer extends React.Component {
                     audio={false}
                     height={350}
                     ref={this.setRef}
-                    screenshotFormat="image/jpeg"
+                    screenshotFormat="image/png"
                     width={350}
                 />,
                 <RaisedButton 
